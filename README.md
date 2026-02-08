@@ -21,3 +21,14 @@
 ## Team
 **team members**: Rowan Fartousi, Zora Kang
 **team name**: rowanzora
+
+## Screenshots
+Desktop
+
+<img width="2142" alt="screenshot1" src="https://github.com/user-attachments/assets/e8bce734-895d-4f2a-acae-96c848f35df9" />
+<img width="2157" alt="screenshot3" src="https://github.com/user-attachments/assets/d788a33d-6422-4477-afed-00d0fc7d8708" />
+<img width="1935" alt="screenshot6" src="https://github.com/user-attachments/assets/b4d3e051-b002-4698-ae26-bb11c496ba36" />
+
+Mobile
+
+<img width="250" alt="screenshot5" src="https://github.com/user-attachments/assets/adaedb36-a54a-4392-a72e-bc4d215bbbf7"/>
