@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add New Title – IMDb</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="webmeji.css">
+  <script src="config.js"></script>
+  <script src="webmeji.js"></script>
+  <script> 
+  // Helper to make all shimejis react
+  function shimejiReact(action) {
+    if (window.activeWebmejis) {
+      window.activeWebmejis.forEach(meji => {
+        // Force the meji to stop what it's doing and perform the reaction
+        meji.resetAnimation();
+        meji.startAction(action);
+      });
+    }
+  }
+  // Helper to make all shimejis speak
+  function shimejiSpeak(text) {
+    if (window.activeWebmejis) {
+      window.activeWebmejis.forEach(meji => {
+        meji.say(text);
+        meji.startAction('sit'); // Optional: make them sit while talking
+      });
+    }
+  }
+
+  // Helper to hide all speech bubbles
+  function shimejiShush() {
+    if (window.activeWebmejis) {
+      window.activeWebmejis.forEach(meji => meji.shush());
+    }
+  }
+
+  // Map of field IDs/Names to their tooltips
+  const fieldTooltips = {
+    'title': 'Make sure to capitalize correctly!',
+    'year': 'tooltip1',
+    'release_date': 'tooltip2',
+    'runtime': 'tooltip3',
+    'genre': 'tooltip4',
+    'plot': 'Try to keep it short and exciting!',
+    // Add more based on the name or id attribute of your inputs
+  };
+  // React to form focus
+  const form = document.getElementById('imdbForm');
+
+  form.addEventListener('focusin', (e) => {
+    const msg = tooltips[e.target.id];
+    if (msg) shimejiSpeak(msg);
+  });
+
+  form.addEventListener('focusout', () => {
+    shimejiShush();
+  });
+
+  // Re-applying your previous logic for Happy/Sad reactions
+  form.addEventListener('change', (e) => {
+    if (e.target.value !== "") shimejiReact('dance'); 
+  });
+
+  // Update your existing nextPage function to include the "Sad" reaction
+  function nextPage() {
+    const page = pages[currentPage - 1];
+    const required = page.querySelectorAll('input[required], select[required], textarea[required]');
+    let valid = true;
+    required.forEach(el => { if (!el.checkValidity()) valid = false; });
+    
+    if (valid && currentPage < pages.length) {
+      showPage(currentPage + 1);
+    } else if (!valid) {
+      shimejiReact('trip'); // Sad reaction
+      alert('Please fill all required fields before continuing.');
+    }
+  }
+  </script>
+
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=TXFEOF0vbnPp4I9Y8ZS7yq116QCEZ-1pNRU6tB9mIpG0AuNE7zt9ay-2DcZsmq9wcezu6QeaTpJqPKEDv7gEYY93pZ3WDEK3vnVetT9HrknHZbXHW2cgXJnm3GZGz2SFQQ58x1BVCgcDvM7fQL7_edM4j2fYTRm7LwOhHmglKvEpxoq6wgvMUpKrhfhz-nAH-S6cwHaA_LLeie3bwR85TVCoElTphqWUA5eGvdZZoxtzj_Udc6kESUgnBslyKN8x88x6I-oK-EFAw3QGqQ7EMA" charset="UTF-8"></script><style>
+    :root {
+      --bg: #0f0f0f;
+      --panel: #1a1a1a;
+      --panel-2: #222;
+      --text: #f5f5f5;
+      --muted: #bdbdbd;
+      --accent: #f5c518;
+      --border: #333;
+      --error: #ff6b6b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 20px;
+      background: var(--accent);
+      color: #000;
+      padding: 4px 8px;
+      border-radius: 3px;
+    }
+
+    .progress-wrap {
+      flex: 1;
+      height: 6px;
+      background: #2a2a2a;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 32px auto 64px;
+      padding: 0 16px;
+    }
+
+    h1 { margin-bottom: 8px; }
+    .subtitle { color: var(--muted); margin-bottom: 32px; }
+
+    .page {
+      display: none;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .page.active { display: block; }
+
+    h2 { margin-top: 0; }
+
+    .field { margin-bottom: 16px; }
+
+    label { font-weight: 600; display: block; margin-bottom: 6px; }
+    .required::after { content: " *"; color: var(--accent); }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+    }
+
+    textarea { resize: vertical; min-height: 120px; }
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.option {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 600;
+  position: relative;
+  transition: all 0.2s ease;
+  /* solve phone issues */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none; 
+}
+
+/* select：through CSS :has and js for .selected */
+.option:has(input:checked), .option.selected {
+  outline: 2px solid var(--accent);
+  background: #26220f;
+  border-color: var(--accent);
+}
+
+    .accordion {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+
+    .accordion-header {
+      cursor: pointer;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .accordion-header::before {
+      content: "▸";
+      transition: transform 0.2s ease;
+    }
+
+    .accordion.open .accordion-header::before {
+      transform: rotate(90deg);
+    }
+
+    .accordion-content {
+      display: none;
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .accordion.open .accordion-content { display: block; }
+
+    .repeat-group {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .add-btn {
+      background: none;
+      border: 1px dashed var(--border);
+      color: var(--accent);
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+    }
+
+    button {
+      padding: 12px 20px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-secondary { background: #2a2a2a; color: var(--text); border: 1px solid var(--border); }
+    .btn-primary { background: var(--accent); color: #000; }
+
+    footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 32px; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">IMDb</div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+</header>
+
+<main>
+<h1>Add a New Title</h1>
+<div class="subtitle">Submit accurate information to help keep IMDb up to date.</div>
+
+<form id="imdbForm">
+
+<section class="page active" data-page="1">
+<h2>Section 1 – Basic Information</h2>
+
+<div class="field">
+<label class="required">Type of Title</label>
+<div class="options-grid">
+<label class="option"><input type="radio" name="type" required>Film</label>
+<label class="option"><input type="radio" name="type">Music Video</label>
+<label class="option"><input type="radio" name="type">Podcast</label>
+<label class="option"><input type="radio" name="type">TV</label>
+<label class="option"><input type="radio" name="type">Video</label>
+<label class="option"><input type="radio" name="type">Video Game</label>
+</div>
+</div>
+
+<div class="field"><label class="required">Title</label><input id="title" required></div>
+<div class="field"><label class="required">Status</label><select required><option value=""></option><option>Complete but unreleased</option><option>Full release</option><option>Limited release</option><option>Not complete</option></select></div>
+<div class="field"><label class="required">Country</label><select required><option selected>United Kingdom</option><option>Canada</option><option>France</option><option>United States</option></select></div>
+<div class="field">
+  <label class="required">Release Date</label>
+  <input 
+    type="date" 
+    id="release-date-input" 
+    required 
+    style="cursor: pointer;"
+  >
+  <p id="date-error" style="color: #ff6b6b; font-size: 12px; margin-top: 5px; display: none;"></p>
+</div>
+<div class="field"><label class="required">Release Type</label><select required><option value=""></option><option>Festival</option><option>Limited cinemas</option><option>Nationwide cinemas</option><option>Physical media</option><option>Premiere event</option><option>Streaming service</option><option>TV broadcast</option><option>Unknown</option><option>Other</option></select></div>
+
+<div class="nav"><span></span><button type="button" class="btn-primary" onclick="nextPage()">Next →</button></div>
+</section>
+
+<section class="page" data-page="2">
+<h2>Section 2 – Proof</h2>
+<div class="field">
+  <label class="required">Evidence Link</label><br>
+  <input 
+    type="url" 
+    id="evidence-url" 
+    required
+    placeholder="https://example.com" 
+    style="width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; outline: none;"
+  >
+  <p id="url-feedback" style="font-size: 12px; margin-top: 5px; color: #d93025; display: none;"></p>
+</div>
+<div class="field"><label>Description</label><input placeholder="description (date if known) (language if not English)"></div>
+<div class="nav"><button type="button" class="btn-secondary" onclick="prevPage()">← Back</button><button type="button" class="btn-primary" onclick="nextPage()">Next →</button></div>
+</section>
+
+<section class="page" data-page="3">
+<h2>Section 3 – Movie Information</h2>
+
+<div class="accordion open">
+<div class="accordion-header">Genre</div>
+<div class="accordion-content"><select multiple><option>Action</option><option>Comedy</option><option>Drama</option><option>Fantasy</option><option>Horror</option></select></div>
+</div>
+
+<div class="accordion"><div class="accordion-header">Languages</div><div class="accordion-content"><select multiple><option>Arabic</option><option>English</option><option>French</option><option>Spanish</option></select></div></div>
+
+<div class="accordion"><div class="accordion-header">Colour / Black & White</div><div class="accordion-content"><div class="options-grid"><label class="option"><input type="radio" name="colour">Colour</label><label class="option"><input type="radio" name="colour">Black & White</label></div></div></div>
+
+<div class="accordion"><div class="accordion-header">Country of Origin</div><div class="accordion-content"><select multiple><option>Canada</option><option>France</option><option>United Kingdom</option><option>United States</option></select></div></div>
+
+<div class="accordion"><div class="accordion-header">Directors</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Name"><select><option>Co-director</option><option>General director</option></select><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Director</button></div></div>
+
+<div class="nav"><button type="button" class="btn-secondary" onclick="prevPage()">← Back</button><button type="button" class="btn-primary" onclick="nextPage()">Next →</button></div>
+</section>
+
+<section class="page" data-page="4">
+<h2>Section 4 – Production Information</h2>
+
+<div class="accordion open"><div class="accordion-header">Budget</div><div class="accordion-content"><input type="number" placeholder="Amount"><select><option>GBP – British Pound</option><option>USD – US Dollar</option></select></div></div>
+
+<div class="accordion"><div class="accordion-header">Official Sites</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Link"><input placeholder="Description"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Site</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Distributors</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Company"><select><option>Canada</option><option>France</option><option>United Kingdom</option><option>United States</option></select><input type="date"><select><option>Video</option><option>VHS</option><option>Theatrical</option><option>DVD</option><option>All media</option><option>TV</option><option>Blu-ray</option><option>Ultra HD Blu-ray</option></select><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Distributor</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Production Companies</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Company"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Company</button></div></div>
+
+<div class="nav"><button type="button" class="btn-secondary" onclick="prevPage()">← Back</button><button type="button" class="btn-primary" onclick="nextPage()">Next →</button></div>
+</section>
+
+<section class="page" data-page="5">
+<h2>Section 5 – Major Credits</h2>
+
+<div class="accordion open"><div class="accordion-header">Cast</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Name"><input placeholder="Character"><select><option>Actor</option><option>Actress</option></select><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Cast</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Self</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Name"><input placeholder="Role"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Self</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Writers</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Name"><input placeholder="Role"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Writer</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Producers</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Name"><input placeholder="Role"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Producer</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Composers</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Name"><input placeholder="Role"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Composer</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Cinematographers</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Name"><input placeholder="Role"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Cinematographer</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Editors</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Name"><input placeholder="Role"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Editor</button></div></div>
+
+<div class="nav"><button type="button" class="btn-secondary" onclick="prevPage()">← Back</button><button type="button" class="btn-primary" onclick="nextPage()">Next →</button></div>
+</section>
+
+<section class="page" data-page="6">
+<h2>Section 6 – Details</h2>
+
+<div class="accordion open"><div class="accordion-header">Certificate Information (Age Rating)</div><div class="accordion-content"><div class="repeat-group"><select multiple><option>USA: PG</option><option>USA: 13+</option><option>Canada: PG</option><option>Canada: 14+</option></select><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Rating</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Running Time</div><div class="accordion-content"><div class="repeat-group"><select><option>United Kingdom</option><option>United States</option></select><input type="number" placeholder="Minutes"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Runtime</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Filming Locations</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Location"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Location</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Sound Mix</div><div class="accordion-content"><select><option>Mono</option><option>Stereo</option><option>Dolby Atmos</option></select></div></div>
+
+<div class="accordion"><div class="accordion-header">Aspect Ratio</div><div class="accordion-content"><select><option>4:3</option><option>16:9</option><option>1.85:1</option><option>2.39:1</option></select></div></div>
+
+<div class="accordion"><div class="accordion-header">Taglines</div><div class="accordion-content"><div class="repeat-group"><input placeholder="Tagline"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Tagline</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Plot Outlines</div><div class="accordion-content"><div class="repeat-group"><select><option>English</option><option>French</option><option>Arabic</option></select><textarea></textarea><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Plot Outline</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Plot Summary</div><div class="accordion-content"><div class="repeat-group"><input placeholder="By"><textarea></textarea><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Summary</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Keywords</div><div class="accordion-content"><div class="repeat-group"><select><option>Plot Detail</option><option>Plot Timeframe</option><option>Subgenre</option><option>Other</option></select><input placeholder="Keyword"><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Keyword</button></div></div>
+
+<div class="accordion"><div class="accordion-header">Trivia</div><div class="accordion-content"><div class="repeat-group"><textarea></textarea><button type="button" class="remove-btn" onclick="removeGroup(this)">− Remove</button></div><button type="button" class="add-btn" onclick="duplicate(this)">+ Add Trivia</button></div></div>
+
+<div class="nav"><button type="button" class="btn-secondary" onclick="prevPage()">← Back</button><button type="submit" class="btn-primary">Submit</button></div>
+</section>
+
+</form>
+<footer>Mock IMDb form - Rowan & Zora</footer>
+</main>
+
+<script>
+let currentPage = 1;
+const pages = document.querySelectorAll('.page');
+const progress = document.getElementById('progress');
+
+// Add this near the bottom of your script
+document.getElementById('imdbForm').addEventListener('change', (e) => {
+  if (e.target.value !== "") {
+    shimejiReact('dance'); // Happy when data is entered
+  }
+});
+
+function updateProgress() {
+  progress.style.width = ((currentPage - 1) / (pages.length - 1)) * 100 + '%';
+}
+
+function showPage(n) {
+  pages.forEach(p => p.classList.remove('active'));
+  pages[n - 1].classList.add('active');
+  currentPage = n;
+  updateProgress();
+  window.scrollTo(0, 0);
+}
+
+function nextPage() {
+  const page = pages[currentPage - 1];
+  const requiredFields = page.querySelectorAll('[required]');
+  let allValid = true;
+
+  requiredFields.forEach(el => {
+    let isFieldValid = true;
+
+    if (el.type === 'radio') {
+      const groupName = el.name;
+      const isChecked = page.querySelector(`input[name="${groupName}"]:checked`);
+      isFieldValid = !!isChecked;
+    } else {
+      isFieldValid = el.value.trim() !== "" && el.checkValidity();
+    }
+
+    if (!isFieldValid) {
+      allValid = false;
+      el.style.borderColor = "var(--error)";
+      const field = el.closest('.field');
+      if (field) field.style.borderLeft = "4px solid var(--error)";
+    } else {
+      el.style.borderColor = "var(--border)";
+      const field = el.closest('.field');
+      if (field) field.style.borderLeft = "none";
+    }
+  });
+
+  if (allValid) {
+    // including wrong url
+    if (currentPage < pages.length) {
+      showPage(currentPage + 1);
+    }
+  } else {
+    // not pass condition
+    const firstError = page.querySelector('[style*="var(--error)"]');
+    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function prevPage() { if (currentPage > 1) showPage(currentPage - 1); }
+
+function duplicate(btn) {
+  const group = btn.previousElementSibling.cloneNode(true);
+  group.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
+  btn.before(group);
+}
+
+function removeGroup(btn) {
+  const container = btn.closest('.accordion-content');
+  const groups = container.querySelectorAll('.repeat-group');
+  if (groups.length > 1) btn.closest('.repeat-group').remove();
+}
+
+updateProgress();
+
+document.querySelectorAll('.accordion-header').forEach(h => {
+  h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+});
+
+// custom option selection styling
+document.querySelectorAll('.option').forEach(opt => {
+  const input = opt.querySelector('input');
+  
+  opt.addEventListener('click', (e) => {
+    if (input.type === 'radio') {
+      const groupName = input.name;
+      document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+        r.parentElement.classList.remove('selected');
+      });
+    }
+
+    input.checked = true;
+    
+    opt.classList.add('selected');
+    
+    opt.style.borderColor = "var(--border)";
+  });
+});
+
+const urlInput = document.getElementById('evidence-url');
+const feedback = document.getElementById('url-feedback');
+
+urlInput.addEventListener('input', () => {
+  const value = urlInput.value.trim();
+
+  if (value === "") {
+    hideError();
+    return;
+  }
+
+  try {
+    const testUrl = new URL(value);
+    
+    if (!/^https?:\/\//i.test(value)) {
+      showError("Please start with http:// or https://");
+    } 
+    else if (testUrl.hostname.length === 0) {
+      showError("Please enter a complete domain (e.g., example.com)");
+    } 
+    else {
+      hideError();
+    }
+  } catch (e) {
+    showError("Invalid URL format. Example: https://google.com");
+  }
+});
+
+/**
+ * Error display: red words displayed
+ */
+function showError(message) {
+  feedback.textContent = message;
+  feedback.style.display = "block";
+  urlInput.style.borderColor = "#d93025";
+}
+
+
+function hideError() {
+  feedback.style.display = "none";
+  urlInput.style.borderColor = "#ccc";
+}
+
+
+const dateInput = document.getElementById('release-date-input');
+
+/**
+ * input show calendar
+ */
+dateInput.addEventListener('click', function() {
+  if ('showPicker' in HTMLInputElement.prototype) {
+    this.showPicker();
+  }
+});
+
+dateInput.addEventListener('input', () => {
+  dateInput.style.borderColor = "var(--border)";
+  const dateError = document.getElementById('date-error-msg');
+  if (dateError) dateError.style.display = 'none';
+});
+
+</script>
+</body>
+</html>

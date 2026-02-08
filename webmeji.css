@@ -1,0 +1,56 @@
+/* webmeji */
+.webmeji-container {
+  position: fixed;
+  bottom: 0;
+  width: 150px;
+  height: 150px;
+  overflow: visible;
+  z-index: 9999;
+}
+
+.webmeji-container img {
+  width: 100%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+  display: block;
+  transform-origin: center;
+}
+
+@media (max-width: 768px) {
+  .webmeji-container {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* Shimeji Speech Bubble */
+.webmeji-bubble {
+  position: absolute;
+  bottom: 110%; /* Sits above the creature */
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  color: #333;
+  border: 2px solid #000;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: bold;
+  white-space: nowrap;
+  z-index: 10001;
+  display: none; /* Hidden by default */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* The little arrow at the bottom of the bubble */
+.webmeji-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -8px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: white transparent transparent transparent;
+}
